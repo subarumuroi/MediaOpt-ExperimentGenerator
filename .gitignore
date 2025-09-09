@@ -21,7 +21,7 @@ build/
 Thumbs.db
 
 # Data
-data/
+/data/
 outputs/
 logs/
 
