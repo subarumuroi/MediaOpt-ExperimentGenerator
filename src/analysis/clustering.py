@@ -93,7 +93,16 @@ def compute_ratio_distance_matrix(df, eps=None, drop_cols=None):
 def hierarchical_clustering(distance_matrix, plot=True, title='Hierarchical Clustering'):
     '''
     Perform average-linkage clustering and optionally plot dendrogram.
+
+    Args: 
+        distance_matrix (pd.DataFrame): pairwise distance matrix
+        plot (bool): whether to plot dendrogram
+        title (str): title for the dendrogram plot
+
+    Returns:
+        Z (ndarray): linkage matrix from scipy.cluster.hierarchy.linkage
     '''
+    
     condensed = squareform(distance_matrix.values)
     Z = linkage(condensed, method='average')
 
