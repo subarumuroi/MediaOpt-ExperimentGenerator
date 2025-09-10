@@ -76,10 +76,24 @@ def compute_ratio_distance_matrix(df, eps=None, drop_cols=None):
 
     # ---max-min range distance ---
     range_values = []
+    '''
     for _, row in ratio_df. iterrows():
         vals = row[sample_cols]. replace(0, np.nan)
         rng = eps if vals.notna().sum() == 0 else max(vals.max() - vals.min(), eps)
         range_values.append(rng)
+    '''
+    for c1, c2 in compound_pairs:
+        vals1 = compound_map.loc[c1]
+        vals2 = compound_map.loc[c2]
+        logdiff = (np.log10(vals1 + eps) - np.log10(vals2 + eps)).abs()
+
+        if logdiff.notna().sum() == 0:
+            rng = eps
+        else:
+            rng = max(logdiff.max() - logdiff.min(), eps)
+
+        range_values.append(rng)
+
     ratio_df['Range_Ratio'] = range_values
 
     distance_matrix_range = pd.DataFrame(0, index=compounds, columns=compounds, dtype=float)
