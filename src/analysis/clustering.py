@@ -124,3 +124,5 @@ def generate_merge_table(Z, compounds, plot_elbow= True):
         plt.title('Elbow Plot for Clustering')
         plt.grid(True)
         plt.show()
+
+    return merge_df_sorted
