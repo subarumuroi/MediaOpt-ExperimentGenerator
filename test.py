@@ -2,7 +2,7 @@ from src.data.processing import load_and_filter_yarrowia_matrix
 from src.analysis.descriptives import compute_compound_stats
 from src.analysis.clustering import compute_ratio_distance_matrix, hierarchical_clustering, generate_merge_table
 from src.generator.cluster_scaler import ClusterScaler
-from src.generator.cluster_utils import generate_clusters
+from src.generator.cluster_utils import generate_clusters, generate_lhs_samples
 
 
 file_path = ("data/Media-Matrix-Combined-grams-per-litre-Annotate.csv")
@@ -24,18 +24,18 @@ std_matrix_v = compute_ratio_distance_matrix(vitamin_df, drop_cols=drop_v)
 Z_v_std = hierarchical_clustering(std_matrix_v, title="Vitamin Clustering (Std)")
 merge_df_v = generate_merge_table(Z_v_std, compounds=std_matrix_v.index.tolist())
 
-# Elements
-scalers_e = generate_clusters(merge_df_e, df_e_bounds, prefix="cluster_e", threshold=0.5)
-# Vitamins
-scalers_v = generate_clusters(merge_df_v, df_v_bounds, prefix="cluster_v", threshold=0.5)
-
-# Access like before
-#scaler_e1 = scalers_e["cluster_e1"]
-#scaler_v2 = scalers_v["cluster_v2"]
 
 
-print (scalers_e)
-print (scalers_v)
+# --- Generate clusters ---
+clusters_meta_e = generate_clusters(merge_df_e, df_e_bounds, prefix="cluster_e", threshold=0.45)
+clusters_meta_v = generate_clusters(merge_df_v, df_v_bounds, prefix="cluster_v", threshold=0.5)
 
-for name, scaler in scalers_e.items():
-    print(name, scaler.compounds)
+# Combine element and vitamin bounds for LHS
+combined_meta = {
+    'bo_bounds': {**clusters_meta_e['bo_bounds'], **clusters_meta_v['bo_bounds']}
+}
+
+# --- Generate LHS samples ---
+lhs_df = generate_lhs_samples(combined_meta, n_samples=191, random_state=42)
+
+
