@@ -2,6 +2,7 @@ from src.generator.cluster_scaler import ClusterScaler
 
 import pandas as pd
 import numpy as np
+import torch
 from pyDOE3 import lhs
 
 from .cluster_scaler import ClusterScaler
@@ -168,3 +169,46 @@ def generate_lhs_samples(clusters_meta, n_samples=191, random_state=42):
     lhs_df = pd.DataFrame(samples, columns=compounds)
 
     return lhs_df
+
+
+def decode_bo_sample(sample, keys, scalers):
+    """
+    Decode a single BO sample into compound concentrations (linear scale).
+
+    Args:
+        sample (np.ndarray or torch.Tensor): shape (d,)
+        keys (list of str): variable names (cluster or compound)
+        scalers (dict): cluster_name -> ClusterScaler
+
+    Returns:
+        dict: compound -> concentration (g/L, linear scale)
+    """
+    if isinstance(sample, torch.Tensor):
+        sample = sample.detach().cpu().numpy()
+
+    output = {}
+    for value, key in zip(sample, keys):
+        if key.startswith("cluster"):
+            conc_dict = scalers[key].concentration_from_alpha(value)
+            output.update(conc_dict)
+        else:
+            output[key] = 10**value  # log10 → linear
+
+    return output
+
+
+def build_sample_matrix(decoded_samples, compound_order=None):
+    """
+    Build a DataFrame of decoded samples (g/L).
+
+    Args:
+        decoded_samples (list of dict): Output from decode_bo_sample for each sample
+        compound_order (list, optional): enforce specific column order
+
+    Returns:
+        pd.DataFrame: Rows = samples, Cols = compounds
+    """
+    df = pd.DataFrame(decoded_samples)
+    if compound_order:
+        df = df[compound_order]
+    return df
