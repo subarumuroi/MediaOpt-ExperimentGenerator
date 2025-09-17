@@ -21,7 +21,6 @@ build/
 Thumbs.db
 
 # Data
-/data/
 outputs/
 logs/
 
