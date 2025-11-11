@@ -14,8 +14,9 @@ class ClusterScaler:
         self.offsets = np.log10(self.df['Median']) - np.mean(np.log10(self.df['Median']))
 
     def concentration_from_alpha(self, alpha):
-        return {c: 10**(alpha + offset) for c, offset in zip(self.compounds, self.offsets)}
-
+        #return {c: 10**(alpha + offset) for c, offset in zip(self.compounds, self.offsets)}
+        return {c: 10**(alpha + self.offsets[c]) for c in self.compounds}
+    
     def solve_alpha_for_target(self, compound, target):
         if compound not in self.compounds:
             raise ValueError(f"{compound} not in cluster")
