@@ -19,8 +19,10 @@ class ClusterScaler:
     def solve_alpha_for_target(self, compound, target):
         if compound not in self.compounds:
             raise ValueError(f"{compound} not in cluster")
-        idx = self.compounds.index(compound)
-        return np.log10(target) - self.offsets[idx]
+        #idx = self.compounds.index(compound)
+        #return np.log10(target) - self.offsets[idx]
+        return np.log10(target) - self.offsets[compound]
+
 
     def get_alpha_bounds(self):
         mins = np.log10(self.df['Expanded_Min']) - self.offsets
